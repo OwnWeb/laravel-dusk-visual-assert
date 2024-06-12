@@ -1,6 +1,6 @@
 {
-    "name": "rossjcooper/laravel-dusk-visual-assert",
-    "description": "Adds assertions to compare screenshots taken during Laravel Dusk tests",
+    "name": "siccode-tech/laravel-dusk-visual-assert",
+    "description": "Adds assertions to compare screenshots taken during Laravel Dusk tests, Modified from original to allow Dusk 8",
     "keywords": [
         "laravel",
         "dusk",
