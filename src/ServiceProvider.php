@@ -14,13 +14,13 @@ class ServiceProvider extends \Illuminate\Support\ServiceProvider
             __DIR__ . '/../config/visual-assert.php' => config_path('visual-assert.php'),
         ], 'visual-assert-config');
 
-        Browser::macro('assertScreenshot', function (string $name, float|null $threshold = null, int|null $metric = null) {
+        Browser::macro('assertScreenshot', function (string $name, float|null $threshold = null, int|null $metric = null, int $width = null, int $height = null) {
             /** @var Browser $this */
 
             $threshold = $threshold ?? config('visual-assert.default_threshold');
             $metric = $metric ?? config('visual-assert.default_metric');
-            $width = config('visual-assert.screenshot_width');
-            $height = config('visual-assert.screenshot_height');
+            $width = $width ?? config('visual-assert.screenshot_width');
+            $height = $height ?? config('visual-assert.screenshot_height');
 
             $filePath = sprintf('%s/references/%s.png', rtrim(Browser::$storeScreenshotsAt, '/'), $name);
 
@@ -84,8 +84,7 @@ class ServiceProvider extends \Illuminate\Support\ServiceProvider
             }
 
             foreach (Browser::$responsiveScreenSizes as $device => $size) {
-                $this->resize($size['width'], $size['height'])
-                    ->assertScreenshot("$name$device", $threshold, $metric);
+                $this->assertScreenshot("$name$device", $threshold, $metric, $size['width'], $size['height']);
             }
 
             return $this;
