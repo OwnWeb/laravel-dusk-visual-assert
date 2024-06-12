@@ -34,7 +34,7 @@
         }
     },
     "require": {
-        "laravel/dusk": "^7",
+        "laravel/dusk": "^7|^8",
         "ext-imagick": "*"
     }
 }
