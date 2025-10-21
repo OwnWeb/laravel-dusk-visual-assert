@@ -115,7 +115,7 @@ class ServiceProvider extends \Illuminate\Support\ServiceProvider
             $this->screenshotElement($selector, $diffName);
 
             $diffFilePath = sprintf('%s/%s.png', rtrim(Browser::$storeScreenshotsAt, '/'), $diffName);
-            
+
             // Compare images
             $originalImage = new Imagick($filePath);
             $currentImage = new Imagick($diffFilePath);
