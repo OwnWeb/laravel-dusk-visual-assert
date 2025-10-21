@@ -87,17 +87,11 @@ class ServiceProvider extends \Illuminate\Support\ServiceProvider
             $filePath = sprintf('%s/references/%s.png', rtrim(Browser::$storeScreenshotsAt, '/'), $name);
             $diffName = sprintf('%s-diff', $name);
             $diffFilePath = sprintf('%s/diffs/%s.png', rtrim(Browser::$storeScreenshotsAt, '/'), $diffName);
-            $tempFilePath = sprintf('%s/temp/%s.png', rtrim(Browser::$storeScreenshotsAt, '/'), $name);
 
             // Create directories if they don't exist
             $directoryPath = dirname($filePath);
             if (!is_dir($directoryPath)) {
                 mkdir($directoryPath, 0777, true);
-            }
-
-            $tempDirectoryPath = dirname($tempFilePath);
-            if (!is_dir($tempDirectoryPath)) {
-                mkdir($tempDirectoryPath, 0777, true);
             }
 
             // If no reference exists, create it
@@ -115,29 +109,31 @@ class ServiceProvider extends \Illuminate\Support\ServiceProvider
                 return $this;
             }
 
-            // Take current element screenshot for comparison
-            $this->screenshotElement($selector, 'temp/' . $name);
+            $diffName = sprintf('diffs/%s', $name);
 
+            // Take current element screenshot for comparison
+            $this->screenshotElement($selector, $diffName);
+
+            $diffFilePath = sprintf('%s/%s.png', rtrim(Browser::$storeScreenshotsAt, '/'), $diffName);
+            
             // Compare images
             $originalImage = new Imagick($filePath);
-            $currentImage = new Imagick($tempFilePath);
+            $currentImage = new Imagick($diffFilePath);
 
             if (
                 $originalImage->getImageWidth() !== $currentImage->getImageWidth()
                 || $originalImage->getImageHeight() !== $currentImage->getImageHeight()
             ) {
-                // Clean up temp file
-                unlink($tempFilePath);
-
                 if (config('visual-assert.skip_if_different_element_size', false)) {
                     return $this;
                 }
 
-                Assert::assertTrue(false, sprintf("Element screenshots are not the same size (original: %dx%d, current: %dx%d). The element may have changed dimensions.",
+                Assert::assertTrue(false, sprintf("Element screenshots are not the same size (original: %dx%d, current: %dx%d). The element may have changed dimensions. Difference can be viewed at: %s",
                     $originalImage->getImageWidth(),
                     $originalImage->getImageHeight(),
                     $currentImage->getImageWidth(),
-                    $currentImage->getImageHeight()
+                    $currentImage->getImageHeight(),
+                    $diffFilePath
                 ));
                 return $this;
             }
@@ -146,9 +142,6 @@ class ServiceProvider extends \Illuminate\Support\ServiceProvider
 
             // If there's a difference above threshold, save the diff
             if ($result[1] > $threshold) {
-                // Move temp file to diff folder
-                rename($tempFilePath, $diffFilePath);
-
                 // Also create a visual diff image
                 $visualDiffPath = sprintf('%s/diffs/%s-visual.png', rtrim(Browser::$storeScreenshotsAt, '/'), $name);
                 $result[0]->setImageFormat("png");
@@ -157,7 +150,6 @@ class ServiceProvider extends \Illuminate\Support\ServiceProvider
                 Assert::assertLessThanOrEqual($threshold, $result[1], sprintf('Element screenshots are not the same. Difference can be viewed at: %s and visual diff at: %s', $diffFilePath, $visualDiffPath));
             } else {
                 // Clean up temp file
-                unlink($tempFilePath);
                 Assert::assertLessThanOrEqual($threshold, $result[1], 'Element screenshots match within threshold.');
             }
 
