@@ -18,28 +18,48 @@ Publish the config file to control default settings:
 php artisan vendor:publish --tag=visual-assert-config
 ```
 
-
 ## Usage
 
 The Dusk Browser class now has access to some new methods:
 
 ### assertScreenshot()
 
-This method will take a screenshot of the current page and compare it to a reference image (generated the first time the test is run). 
+This method will take a screenshot of the current page and compare it to a reference image (generated the first time the test is run).
 
 If the images are different, the test will fail and save the image diff so you can inspect the differences.
 
 ```php
-$browser->assertScreenshot(string $name, float|null $threshold = null, int|null $metric = null)
+$browser->assertScreenshot(string $name, float|null $threshold = null, int|null $metric = null, int|null $width = null, int|null $height = null)
 ```
 
-Example: 
+Example:
 
 ```php
 $this->browse(function (Browser $browser) {
-        $browser->visit('/')
-            ->assertScreenshot('home');
-    });
+    $browser->visit('/')
+        ->assertScreenshot('home');
+});
+```
+
+### assertElementScreenshot()
+
+Take a screenshot of a specific element and compare it to a reference image. Perfect for testing individual components without worrying about the rest of the page.
+
+```php
+$browser->assertElementScreenshot(string $selector, string $name, float|null $threshold = null, int|null $metric = null)
+```
+
+Example:
+
+```php
+$this->browse(function (Browser $browser) {
+    $browser->visit('/login')
+        // Test that the login form hasn't changed
+        ->assertElementScreenshot('#login-form', 'login-form')
+        
+        // Test header with custom threshold
+        ->assertElementScreenshot('header', 'header', 0.02);
+});
 ```
 
 ### assertResponsiveScreenshots()
@@ -54,9 +74,115 @@ Example:
 
 ```php
 $this->browse(function (Browser $browser) {
-        $browser->visit('/')
-            ->assertResponsiveScreenshots('home');
-    });
+    $browser->visit('/')
+        ->assertResponsiveScreenshots('home');
+});
+```
+
+### assertResponsiveElementScreenshots()
+
+Test an element at different responsive breakpoints.
+
+```php
+$browser->assertResponsiveElementScreenshots(string $selector, string $name, float|null $threshold = null, int|null $metric = null)
+```
+
+Example:
+
+```php
+$this->browse(function (Browser $browser) {
+    $browser->visit('/products')
+        // Test product grid at different screen sizes
+        ->assertResponsiveElementScreenshots('.product-grid', 'product-grid');
+});
+```
+
+### assertElementsScreenshots()
+
+Test multiple elements at once by providing an array of selectors and names.
+
+```php
+$browser->assertElementsScreenshots(array $elements, float|null $threshold = null, int|null $metric = null)
+```
+
+Example:
+
+```php
+$this->browse(function (Browser $browser) {
+    $browser->visit('/dashboard')
+        ->assertElementsScreenshots([
+            '#sidebar' => 'dashboard-sidebar',
+            '.user-profile' => 'user-profile-card',
+            '#main-content' => 'main-content-area',
+        ]);
+});
+```
+
+### assertScreenshotWithoutFixed()
+
+Take a screenshot with fixed elements (like sticky headers, chat widgets, cookie banners) automatically hidden.
+
+```php
+$browser->assertScreenshotWithoutFixed(string $name, array|null $selectorsToHide = null, float|null $threshold = null, int|null $metric = null, int|null $width = null, int|null $height = null)
+```
+
+Example:
+
+```php
+$this->browse(function (Browser $browser) {
+    $browser->visit('/')
+        // Uses default selectors from config
+        ->assertScreenshotWithoutFixed('homepage-clean')
+        
+        // Hide specific elements
+        ->assertScreenshotWithoutFixed('homepage-custom', [
+            '.chat-widget',
+            '#cookie-banner',
+            '.sticky-nav'
+        ]);
+});
+```
+
+### assertElementScreenshotWithoutFixed()
+
+Take an element screenshot with fixed elements hidden.
+
+```php
+$browser->assertElementScreenshotWithoutFixed(string $selector, string $name, array|null $selectorsToHide = null, float|null $threshold = null, int|null $metric = null)
+```
+
+Example:
+
+```php
+$this->browse(function (Browser $browser) {
+    $browser->visit('/products')
+        ->assertElementScreenshotWithoutFixed(
+            '.product-grid',
+            'products-no-overlay',
+            ['.promo-popup', '.flash-sale-banner']
+        );
+});
+```
+
+### withoutFixedElements()
+
+Temporarily hide fixed elements for multiple operations.
+
+```php
+$browser->withoutFixedElements(callable $callback, array|null $selectors = null)
+```
+
+Example:
+
+```php
+$this->browse(function (Browser $browser) {
+    $browser->visit('/dashboard')
+        ->withoutFixedElements(function ($browser) {
+            return $browser
+                ->assertScreenshot('dashboard-clean')
+                ->assertElementScreenshot('#charts', 'charts-clean');
+        }, ['.fixed']);
+});
 ```
 
 ## Updating reference images

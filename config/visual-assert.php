@@ -13,4 +13,19 @@ return [
     'default_metric' => \Imagick::METRIC_MEANSQUAREERROR,
 
     'skip_if_different_window_size' => false,
+
+    /**
+     * Skip assertion if element sizes don't match (for element screenshots)
+     * If true, the test will pass without comparison when element dimensions differ
+     * If false, the test will fail when element dimensions differ
+     */
+    'skip_if_different_element_size' => false,
+
+    /**
+     * CSS selectors for fixed elements to hide during screenshots
+     */
+    'fixed_elements_to_hide' => [
+        '.fixed',
+        '.sticky',
+    ],
 ];
