@@ -54,7 +54,7 @@ class ServiceProvider extends \Illuminate\Support\ServiceProvider
                 if (config('visual-assert.skip_if_different_window_size', false)) {
                     return $this;
                 }
-                Assert::assertTrue(false, sprintf('Screenshots are not the same size, ensure the screenshots are taken using the same Dusk environment.'));
+                Assert::assertTrue(false, sprintf("Screenshots are not the same size (original: %dx%d, current: %dx%d). The browser window size may have changed between screenshots."));
 
                 return $this;
             }
@@ -133,7 +133,12 @@ class ServiceProvider extends \Illuminate\Support\ServiceProvider
                     return $this;
                 }
 
-                Assert::assertTrue(false, sprintf('Element screenshots are not the same size. The element may have changed dimensions.'));
+                Assert::assertTrue(false, sprintf("Element screenshots are not the same size (original: %dx%d, current: %dx%d). The element may have changed dimensions.",
+                    $originalImage->getImageWidth(),
+                    $originalImage->getImageHeight(),
+                    $currentImage->getImageWidth(),
+                    $currentImage->getImageHeight()
+                ));
                 return $this;
             }
 
