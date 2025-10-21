@@ -253,7 +253,7 @@ class ServiceProvider extends \Illuminate\Support\ServiceProvider
         });
 
         // Macro for screenshot without fixed elements
-        Browser::macro('assertScreenshotWithoutFixed', function (string $name, array $selectorsToHide = null, float|null $threshold = null, int|null $metric = null, int $width = null, int $height = null) {
+        Browser::macro('assertScreenshotWithoutFixed', function (string $name, float|null $threshold = null, array $selectorsToHide = null, int|null $metric = null, int $width = null, int $height = null) {
             /** @var Browser $this */
             return $this->withoutFixedElements(function ($browser) use ($name, $threshold, $metric, $width, $height) {
                 return $browser->assertScreenshot($name, $threshold, $metric, $width, $height);
@@ -261,7 +261,7 @@ class ServiceProvider extends \Illuminate\Support\ServiceProvider
         });
 
         // Macro for element screenshot without fixed elements
-        Browser::macro('assertElementScreenshotWithoutFixed', function (string $selector, string $name, array $selectorsToHide = null, float|null $threshold = null, int|null $metric = null) {
+        Browser::macro('assertElementScreenshotWithoutFixed', function (string $selector, string $name, float|null $threshold = null, array $selectorsToHide = null, int|null $metric = null) {
             /** @var Browser $this */
             return $this->withoutFixedElements(function ($browser) use ($selector, $name, $threshold, $metric) {
                 return $browser->assertElementScreenshot($selector, $name, $threshold, $metric);
