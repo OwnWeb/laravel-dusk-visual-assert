@@ -1,4 +1,5 @@
 <?php
+
 namespace Rossjcooper\LaravelDuskVisualAssert;
 
 use Imagick;
@@ -13,7 +14,7 @@ class ServiceProvider extends \Illuminate\Support\ServiceProvider
             __DIR__ . '/../config/visual-assert.php' => config_path('visual-assert.php'),
         ], 'visual-assert-config');
 
-        Browser::macro('assertScreenshot', function (string $name, float|null $threshold = null, int|null $metric = null, int $width = null, int $height = null) {
+        Browser::macro('assertScreenshot', function (string $name, float|null $threshold = null, int|null $metric = null, int $width = null, int $height = null): Browser {
             /** @var Browser $this */
 
             $threshold = $threshold ?? config('visual-assert.default_threshold');
@@ -74,7 +75,7 @@ class ServiceProvider extends \Illuminate\Support\ServiceProvider
         });
 
         // Element screenshot assertion macro
-        Browser::macro('assertElementScreenshot', function (string $selector, string $name, float|null $threshold = null, int|null $metric = null) {
+        Browser::macro('assertElementScreenshot', function (string $selector, string $name, float|null $threshold = null, int|null $metric = null): Browser {
             /** @var Browser $this */
             $threshold = $threshold ?? config('visual-assert.default_threshold');
             $metric = $metric ?? config('visual-assert.default_metric');
@@ -156,7 +157,7 @@ class ServiceProvider extends \Illuminate\Support\ServiceProvider
             return $this;
         });
 
-        Browser::macro('assertResponsiveScreenshots', function (string $name, float|null $threshold = null, int|null $metric = null) {
+        Browser::macro('assertResponsiveScreenshots', function (string $name, float|null $threshold = null, int|null $metric = null): Browser {
             /** @var Browser $this */
             $threshold = $threshold ?? config('visual-assert.default_threshold');
             $metric = $metric ?? config('visual-assert.default_metric');
@@ -173,7 +174,7 @@ class ServiceProvider extends \Illuminate\Support\ServiceProvider
         });
 
         // Responsive element screenshots macro
-        Browser::macro('assertResponsiveElementScreenshots', function (string $selector, string $name, float|null $threshold = null, int|null $metric = null) {
+        Browser::macro('assertResponsiveElementScreenshots', function (string $selector, string $name, float|null $threshold = null, int|null $metric = null): Browser {
             /** @var Browser $this */
             $threshold = $threshold ?? config('visual-assert.default_threshold');
             $metric = $metric ?? config('visual-assert.default_metric');
@@ -194,7 +195,7 @@ class ServiceProvider extends \Illuminate\Support\ServiceProvider
         });
 
         // Helper macro to assert multiple elements at once
-        Browser::macro('assertElementsScreenshots', function (array $elements, float|null $threshold = null, int|null $metric = null) {
+        Browser::macro('assertElementsScreenshots', function (array $elements, float|null $threshold = null, int|null $metric = null): Browser {
             /** @var Browser $this */
             $threshold = $threshold ?? config('visual-assert.default_threshold');
             $metric = $metric ?? config('visual-assert.default_metric');
@@ -207,7 +208,7 @@ class ServiceProvider extends \Illuminate\Support\ServiceProvider
         });
 
         // Macro to hide fixed/sticky elements before taking screenshots
-        Browser::macro('withoutFixedElements', function (callable $callback, array $selectors = null) {
+        Browser::macro('withoutFixedElements', function (callable $callback, array $selectors = null): Browser {
             /** @var Browser $this */
 
             // Use default selectors if none provided
@@ -253,7 +254,7 @@ class ServiceProvider extends \Illuminate\Support\ServiceProvider
         });
 
         // Macro for screenshot without fixed elements
-        Browser::macro('assertScreenshotWithoutFixed', function (string $name, float|null $threshold = null, array $selectorsToHide = null, int|null $metric = null, int $width = null, int $height = null) {
+        Browser::macro('assertScreenshotWithoutFixed', function (string $name, float|null $threshold = null, array $selectorsToHide = null, int|null $metric = null, int $width = null, int $height = null): Browser {
             /** @var Browser $this */
             return $this->withoutFixedElements(function ($browser) use ($name, $threshold, $metric, $width, $height) {
                 return $browser->assertScreenshot($name, $threshold, $metric, $width, $height);
@@ -261,7 +262,7 @@ class ServiceProvider extends \Illuminate\Support\ServiceProvider
         });
 
         // Macro for element screenshot without fixed elements
-        Browser::macro('assertElementScreenshotWithoutFixed', function (string $selector, string $name, float|null $threshold = null, array $selectorsToHide = null, int|null $metric = null) {
+        Browser::macro('assertElementScreenshotWithoutFixed', function (string $selector, string $name, float|null $threshold = null, array $selectorsToHide = null, int|null $metric = null): Browser {
             /** @var Browser $this */
             return $this->withoutFixedElements(function ($browser) use ($selector, $name, $threshold, $metric) {
                 return $browser->assertElementScreenshot($selector, $name, $threshold, $metric);
